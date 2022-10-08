@@ -17,12 +17,11 @@ RUN python3.7 get-pip.py
 RUN apt-get install python3.7-dev -y
 
 # pip install dependencies
-RUN pip3 install transformers sentencepiece Sanic redis torch sacremoses
+RUN pip3 install transformers sentencepiece flask redis torch sacremoses gunicorn
 
 # install redis and configure it
 RUN apt-get install redis-server -y
 RUN sed -i 's/bind 127.0.0.1 .*/bind 127.0.0.1/g' /etc/redis/redis.conf
-RUN service redis-server restart
 
 # copy ws file
 WORKDIR /src
@@ -33,4 +32,4 @@ RUN python3.7 load.py
 
 # expose port and run server
 EXPOSE 8081
-CMD ["python3.7", "server.py"]
+CMD service redis-server restart && gunicorn --bind 0.0.0.0:8081 server:app
