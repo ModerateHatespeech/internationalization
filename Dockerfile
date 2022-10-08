@@ -17,7 +17,7 @@ RUN python3.7 get-pip.py
 RUN apt-get install python3.7-dev -y
 
 # pip install dependencies
-RUN pip3 install transformers sentencepiece Sanic redis torch
+RUN pip3 install transformers sentencepiece Sanic redis torch sacremoses
 
 # install redis and configure it
 RUN apt-get install redis-server -y
