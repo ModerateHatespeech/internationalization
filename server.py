@@ -1,11 +1,8 @@
-from sanic import Sanic
-from sanic import response
+from flask import Flask
+from flask import request
 
 from transformers import MarianMTModel, MarianTokenizer
 import torch
-
-from sanic.exceptions import SanicException, ServerError, NotFound
-from sanic.response import text, json
 
 import hashlib
 import redis
@@ -36,7 +33,7 @@ def cache(r):
 
             cache = get_cached(key)
             if cache:
-                return cache
+                return cache.decode()
             else:
                 res = fn(*args, **kwargs)
 
@@ -57,13 +54,14 @@ model.to(device)
 @cache(r)
 def translate(text):
     """ Given (str) text, translate it into English """
-    ouputs = model.generate(**tokenizer(text, return_tensors="pt"))
+    tokens = tokenizer(text, return_tensors="pt").to(device)
+    ouputs = model.generate(**tokens, num_beams=30)
     return tokenizer.decode(ouputs[0], skip_special_tokens=True)
 
-app = Sanic(__name__)
+app = Flask(__name__)
 
 @app.route("/translate", methods=["POST"])
-async def analysis(request):
+def analysis():
     """
     Endpoint takes a POST request, with a JSON array passed as the body and the key "text" denoting the text to translate
     Returns a JSON encoded array with "result" as the translated string and "success" as True
@@ -71,19 +69,18 @@ async def analysis(request):
     Unexpected errors will be logged to docker logs for review
     """
     try:
-        request_json = request.json
+        request_json = request.get_json(force=True)
         if not "text" in request_json:
-            return json({"result": "No text string passed", "success": False})
+            return {"result": "No text string passed", "success": False}
         english = translate(request_json["text"])
-        return json({"result": english, "success": True}) 
+        return {"result": english, "success": True}
     except Exception:
         print(traceback.format_exc())
-        return json({"result": "Internal error", "success": False})
+        return {"result": "Internal error", "success": False}
 
-@app.exception(NotFound)
-async def manage_not_found(request, exception):
-    return text('{"response":"Invalid endpoint"}')
-
+@app.errorhandler(404)
+def manage_not_found():
+    return {"response":"Invalid endpoint"}
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=8081, workers=1)
+    app.run(host="0.0.0.0", port=8081)
