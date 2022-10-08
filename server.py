@@ -20,7 +20,7 @@ def cache(redis):
         """ Check if key (md5 of string) exists inside Redis """
         return redis.exists(key)
 
-    def get_cached(token, data):
+    def get_cached(key):
         """ Get key (md5 of string) from Redis """
         return redis.get(key)
 
@@ -47,7 +47,6 @@ def cache(redis):
 
     return decorator
 
-
 # initialize pretrained ML Model via HF and move to CUDA device if avaliable
 model_name = "Helsinki-NLP/opus-mt-mul-en"
 tokenizer = MarianTokenizer.from_pretrained(model_name)
@@ -55,16 +54,13 @@ model = MarianMTModel.from_pretrained(model_name)
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 model.to(device)
 
-
 @cache(r)
 def translate(text):
     """ Given (str) text, translate it into English """
     ouputs = model.generate(**tokenizer(text, return_tensors="pt"))
     return tokenizer.decode(ouputs[0], skip_special_tokens=True)
 
-
 app = Sanic(__name__)
-
 
 @app.route("/translate", methods=["POST"])
 async def analysis(request):
@@ -82,7 +78,6 @@ async def analysis(request):
     except Exception:
         print(traceback.format_exc())
         return json({"result": "Internal error", "success": False})
-
 
 @app.exception(NotFound)
 async def manage_not_found(request, exception):
