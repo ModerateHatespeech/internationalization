@@ -13,21 +13,21 @@ import traceback
 
 r = redis.StrictRedis(host="localhost", port=6379, db=0)
 
-def cache(redis):
+def cache(r):
     """ Basic decorator that implements a simple Redis KV cache with an infinite TTL """
 
     def is_cached(key):
         """ Check if key (md5 of string) exists inside Redis """
-        return redis.exists(key)
+        return r.exists(key)
 
     def get_cached(key):
         """ Get key (md5 of string) from Redis """
-        return redis.get(key)
+        return r.get(key)
 
     def prime_cache(key, value):
         """ If cached doesn't exist, insert intored cache """
         if not is_cached(key):
-            redis.set(key, value)
+            r.set(key, value)
 
     def decorator(fn):
         def wrapped(*args, **kwargs):
@@ -74,7 +74,7 @@ async def analysis(request):
         request_json = request.json
         if not "text" in request_json:
             return json({"result": "No text string passed", "success": False})
-        return translate(request_json["text"])
+        return json({"result": translate(request_json["text"]), "success": True}) 
     except Exception:
         print(traceback.format_exc())
         return json({"result": "Internal error", "success": False})
