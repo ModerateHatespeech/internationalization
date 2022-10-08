@@ -14,3 +14,11 @@ For example, to call `https://api.moderatehatespeech.com/api/v1/moderate/` with 
   
 Requests are first passed to the hosted translation model (served via Sanic) before being passed to the original endpoint. 
   
+## Usage
+  
+To host your own translation endpoint for language preprocessing, clone the repository and build the docker image using:
+  
+`docker build . -t mhs_translate`
+  
+Then, run the image (pass `--gpus all` for CUDA support) which will be available on port 8081
+  
