@@ -79,7 +79,7 @@ def analysis():
         return {"result": "Internal error", "success": False}
 
 @app.errorhandler(404)
-def manage_not_found():
+def manage_not_found(req):
     return {"response":"Invalid endpoint"}
 
 if __name__ == "__main__":
