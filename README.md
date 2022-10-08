@@ -12,7 +12,7 @@ Internationalization may be implemented by calling `/api/v1/intl/<endpoint>`, wh
   
 For example, to call `https://api.moderatehatespeech.com/api/v1/moderate/` with support for multiple languages, use the `https://api.moderatehatespeech.com/api/v1/intl/moderate/` endpoint.
   
-Requests are first passed to the hosted translation model (served via Sanic) before being passed to the original endpoint. 
+Requests are first passed to the hosted translation model (served via Flask/Gunicorn) before being passed to the original endpoint. 
   
 ## Usage
   
@@ -22,3 +22,8 @@ To host your own translation endpoint for language preprocessing, clone the repo
   
 Then, run the image (pass `--gpus all` for CUDA support) which will be available on port 8081
   
+## Accuracy
+
+OPUS-MT, while generally robust, comes with some accuracy drawbacks. For more powerful CUDA devices, upping the num_beams parameter (to ~30-40) can slightly increas accuracy. However, future deployments could investigate M2M, mBart50, and ISI's RTG v2.1 model.
+
+While inaccuracies in translation will result in a perfomance loss on prediction, generalize capture of a message's meaning is usually suitable for predictions. 
