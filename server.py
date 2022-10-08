@@ -55,7 +55,7 @@ model.to(device)
 def translate(text):
     """ Given (str) text, translate it into English """
     tokens = tokenizer(text, return_tensors="pt").to(device)
-    ouputs = model.generate(**tokens, num_beams=30)
+    ouputs = model.generate(**tokens, num_beams=10)
     return tokenizer.decode(ouputs[0], skip_special_tokens=True)
 
 app = Flask(__name__)
