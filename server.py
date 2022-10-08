@@ -74,7 +74,8 @@ async def analysis(request):
         request_json = request.json
         if not "text" in request_json:
             return json({"result": "No text string passed", "success": False})
-        return json({"result": translate(request_json["text"]), "success": True}) 
+        english = translate(request_json["text"])
+        return json({"result": english, "success": True}) 
     except Exception:
         print(traceback.format_exc())
         return json({"result": "Internal error", "success": False})
