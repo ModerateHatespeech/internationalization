@@ -24,6 +24,6 @@ Then, run the image (pass `--gpus all` for CUDA support) which will be available
   
 ## Accuracy
 
-OPUS-MT, while generally robust, comes with some accuracy drawbacks. For more powerful CUDA devices, upping the num_beams parameter (to ~30-40) can slightly increas accuracy. However, future deployments could investigate M2M, mBart50, and ISI's RTG v2.1 model.
+OPUS-MT, while generally robust, comes with some accuracy drawbacks. For more powerful CUDA devices, upping the num_beams parameter (to ~30-40) can slightly increase accuracy. However, future deployments could investigate M2M, mBart50, and ISI's RTG v2.1 model.
 
-While inaccuracies in translation will result in a perfomance loss on prediction, generalize capture of a message's meaning is usually suitable for predictions. 
+While inaccuracies in translation will result in a perfomance loss on prediction, generalized capture of a message's meaning is usually suitable for predictions. 
